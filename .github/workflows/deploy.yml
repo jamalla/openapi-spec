@@ -1,0 +1,52 @@
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-workers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SPEC_POST_URL: ${{ secrets.SPEC_POST_URL }}
+      SPEC_API_KEY: ${{ secrets.SPEC_API_KEY }}
+      SPEC_API_KEY_HEADER: ${{ vars.SPEC_API_KEY_HEADER }}
+      SPEC_AUTH_HEADER: ${{ secrets.SPEC_AUTH_HEADER }}
+      SPEC_POST_HEADERS: ${{ vars.SPEC_POST_HEADERS }}
+      SPEC_POST_BODY: ${{ vars.SPEC_POST_BODY }}
+      SPEC_RESPONSE_PATH: ${{ vars.SPEC_RESPONSE_PATH }}
+      TARGET_API_BASE_URL: ${{ vars.TARGET_API_BASE_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Deploy Worker
+        run: npx wrangler deploy
+
+      - name: Verify deployment output
+        run: echo "Deployment completed for commit $GITHUB_SHA"
