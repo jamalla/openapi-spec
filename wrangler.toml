@@ -1,0 +1,21 @@
+name = "openapi-contract-certifier"
+main = "src/worker/index.ts"
+compatibility_date = "2026-04-03"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "openapi_contract_runs"
+database_id = "local-dev"
+
+[[r2_buckets]]
+binding = "ARTIFACTS"
+bucket_name = "openapi-contract-artifacts"
+
+[assets]
+directory = "src/ui"
+binding = "ASSETS"
+
+[[workflows]]
+name = "validation-workflow"
+binding = "VALIDATION_WORKFLOW"
+class_name = "ValidationWorkflow"
