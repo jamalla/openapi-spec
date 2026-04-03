@@ -76,3 +76,27 @@ Define explicit scenarios in `src/lib/scenarios/loadScenarios.ts`. Steps support
 - Scenario definitions are explicit and code-configured.
 - Live validation currently checks status/content-type/JSON parse and can be extended for deep schema validation.
 - UI is intentionally minimal and polling-based.
+
+
+## CI deployment (GitHub Actions)
+A GitHub Actions workflow is included at `.github/workflows/deploy.yml`.
+
+### Trigger
+- Automatic on push to `main`
+- Manual via `workflow_dispatch`
+
+### Required GitHub Secrets
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `SPEC_POST_URL`
+- `SPEC_API_KEY`
+- `SPEC_AUTH_HEADER` (optional if you use auth header mode)
+
+### Required GitHub Variables
+- `TARGET_API_BASE_URL`
+- `SPEC_API_KEY_HEADER` (optional)
+- `SPEC_POST_HEADERS` (optional JSON)
+- `SPEC_POST_BODY` (optional JSON string)
+- `SPEC_RESPONSE_PATH` (optional dot path)
+
+The workflow runs `npm ci`, `npm test`, and `npx wrangler deploy`, so deployment does not depend on local machine tooling.
